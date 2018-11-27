@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         childValueEditText = findViewById(R.id.childValueEditText);
         addButton = findViewById(R.id.addButton);
-        removeButton = findViewById(R.id.addButton);
+        removeButton = findViewById(R.id.removeButton);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,5 +41,6 @@ public class MainActivity extends AppCompatActivity {
                 mRef.removeValue();
             }
         });
+
     }
 }
