@@ -52,8 +52,8 @@ public class MainActivity extends AppCompatActivity {
         mRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String childVaue = String.valueOf(dataSnapshot.getValue());
-                childValueTextView.setText(childVaue);
+                String childValue = String.valueOf(dataSnapshot.getValue());
+                childValueTextView.setText(childValue);
             }
 
             @Override
