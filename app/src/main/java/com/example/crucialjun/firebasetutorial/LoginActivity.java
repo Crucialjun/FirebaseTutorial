@@ -14,10 +14,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText emailLogin,passwordLogin,emailRegistration,passwordRegistration;
+    private EditText emailLogin,passwordLogin,emailRegistration,passwordRegistration,mNameRegistration,
+    mAgeRegistration,mSexRegistration;
     private Button buttonLogin,buttonRegistration;
 
     private FirebaseAuth mAuth;
@@ -35,6 +41,9 @@ public class LoginActivity extends AppCompatActivity {
         passwordLogin = findViewById(R.id.passwordLogin);
         emailRegistration = findViewById(R.id.emailRegistration);
         passwordRegistration = findViewById(R.id.passwordRegistration);
+        mNameRegistration = findViewById(R.id.nameRegistration);
+        mAgeRegistration = findViewById(R.id.ageRegistration);
+        mSexRegistration = findViewById(R.id.sexRegistration);
 
         buttonLogin = findViewById(R.id.buttonLogin);
         buttonRegistration = findViewById(R.id.buttonRegistration);
@@ -65,6 +74,20 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(!task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Sign Up Error", Toast.LENGTH_LONG).show();
+                        }else{
+                            String user_id = mAuth.getCurrentUser().getUid();
+                            DatabaseReference current_user = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
+
+                            String name = mNameRegistration.getText().toString();
+                            String age = mAgeRegistration.getText().toString();
+                            String sex = mSexRegistration.getText().toString();
+
+                            Map newPost = new HashMap();
+                            newPost.put("name",name);
+                            newPost.put("age",age);
+                            newPost.put("sex",sex);
+
+                            current_user.setValue(newPost);
                         }
                     }
                 });

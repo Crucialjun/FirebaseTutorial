@@ -32,6 +32,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Registration"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:id="@+id/nameRegistration"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Age"
+        android:id="@+id/ageRegistration"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Sex"
+        android:id="@+id/sexRegistration"/>
 
     <EditText
         android:layout_width="match_parent"
