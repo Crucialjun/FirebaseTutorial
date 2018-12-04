@@ -14,8 +14,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +27,7 @@ import java.util.Map;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText emailLogin,passwordLogin,emailRegistration,passwordRegistration,mNameRegistration,
-    mAgeRegistration,mSexRegistration;
+    mAgeRegistration,mSexRegistration,mUserNameRegistration;
     private Button buttonLogin,buttonRegistration;
 
     private FirebaseAuth mAuth;
@@ -44,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         mNameRegistration = findViewById(R.id.nameRegistration);
         mAgeRegistration = findViewById(R.id.ageRegistration);
         mSexRegistration = findViewById(R.id.sexRegistration);
+        mUserNameRegistration = findViewById(R.id.userNameRegistration);
 
         buttonLogin = findViewById(R.id.buttonLogin);
         buttonRegistration = findViewById(R.id.buttonRegistration);
@@ -67,30 +72,54 @@ public class LoginActivity extends AppCompatActivity {
         buttonRegistration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = emailRegistration.getText().toString();
-                String password = passwordRegistration.getText().toString();
-                mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                final String email = emailRegistration.getText().toString();
+                final String password = passwordRegistration.getText().toString();
+                final String username = mUserNameRegistration.getText().toString();
+                Query usernameQuery = FirebaseDatabase.getInstance().getReference().child("Users")
+                        .orderByChild("username").equalTo(username);
+                usernameQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(!task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "Sign Up Error", Toast.LENGTH_LONG).show();
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.getChildrenCount() > 0){
+                            Toast.makeText(LoginActivity.this,
+                                    "Choose a different username",
+                                    Toast.LENGTH_SHORT).show();
                         }else{
-                            String user_id = mAuth.getCurrentUser().getUid();
-                            DatabaseReference current_user = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
+                            mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if(!task.isSuccessful()) {
+                                        Toast.makeText(LoginActivity.this, "Sign Up Error", Toast.LENGTH_LONG).show();
+                                    }else{
+                                        String user_id = mAuth.getCurrentUser().getUid();
+                                        final DatabaseReference current_user = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
 
-                            String name = mNameRegistration.getText().toString();
-                            String age = mAgeRegistration.getText().toString();
-                            String sex = mSexRegistration.getText().toString();
+                                        final String name = mNameRegistration.getText().toString();
+                                        final String age = mAgeRegistration.getText().toString();
+                                        final String sex = mSexRegistration.getText().toString();
 
-                            Map newPost = new HashMap();
-                            newPost.put("name",name);
-                            newPost.put("age",age);
-                            newPost.put("sex",sex);
+                                        Map newPost = new HashMap();
+                                        newPost.put("name",name);
+                                        newPost.put("username",username);
+                                        newPost.put("age",age);
+                                        newPost.put("sex",sex);
 
-                            current_user.setValue(newPost);
+                                        current_user.setValue(newPost);
+                                    }
+                                }
+                            });
+
                         }
                     }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
                 });
+
+
+
             }
         });
 
